@@ -1,0 +1,56 @@
+# Configuración general de RANNI
+
+assistant:
+  name: "RANNI"
+  wake_word: "ranni"
+  language: "es"
+  debug: false
+
+audio:
+  sample_rate: 16000
+  channels: 1
+  chunk_size: 512
+  mic_device: null  # null = dispositivo por defecto
+  vad_threshold: 0.5
+
+stt:
+  engine: "faster-whisper"
+  model: "tiny"  # tiny, base, small, medium, large
+  device: "auto"  # auto, cpu, cuda
+  compute_type: "int8"  # int8, float16, float32
+
+tts:
+  engine: "piper"
+  voice: "es_ES-daveconroy-medium"
+  speed: 1.0
+  volume: 0.8
+
+llm:
+  engine: "ollama"
+  model: "llama3.2"
+  host: "http://localhost:11434"
+  temperature: 0.3
+  max_tokens: 512
+  context_window: 4096
+  quantization: "q4_k_m"
+
+memory:
+  engine: "chromadb"
+  collection: "ranni_context"
+  embeddings_model: "all-MiniLM-L6-v2"
+  max_history: 100
+
+ui:
+  engine: "electron"
+  width: 1920
+  height: 1080
+  transparent: true
+  frameless: true
+  always_on_top: true
+  fps_idle: 30
+  fps_active: 60
+
+websocket:
+  host: "127.0.0.1"
+  port: 9876
+  reconnect_interval: 2

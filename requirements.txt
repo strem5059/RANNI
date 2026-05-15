@@ -1,0 +1,32 @@
+# === AUDIO ===
+pvporcupine>=3.0.0
+pyaudio>=0.2.14
+faster-whisper>=1.1.0
+piper-tts>=1.2.0
+silero-vad>=4.0.0
+sounddevice>=0.5.1
+
+# === NLP / IA Local ===
+requests>=2.32.0
+ollama>=0.4.0
+sentence-transformers>=3.0.0
+langchain>=0.3.0
+langchain-community>=0.3.0
+chromadb>=0.5.0
+
+# === SISTEMA ===
+PyAutoGUI>=0.9.54
+psutil>=6.1.0
+pygetwindow>=0.0.9
+pywinctl>=0.5.0
+watchdog>=5.0.0
+schedule>=1.2.0
+
+# === COMUNICACIÓN ===
+websockets>=13.0
+asyncio-extra>=1.2.0
+
+# === UTILIDADES ===
+pyyaml>=6.0.2
+pydantic>=2.9.0
+loguru>=0.7.2

@@ -1,0 +1,58 @@
+# Lista blanca de acciones permitidas
+# true = permitido siempre
+# deny = denegado
+# confirm = requiere confirmación del usuario
+
+actions:
+  open_application: true
+  close_application: true
+  minimize_window: true
+  maximize_window: true
+  move_window: true
+  resize_window: true
+  list_windows: true
+
+  read_file: confirm
+  write_file: confirm
+  delete_file: deny
+  list_directory: true
+
+  create_folder: true
+  delete_folder: deny
+
+  system_info: true
+  system_shutdown: confirm
+  system_restart: confirm
+  system_sleep: confirm
+  system_lock: true
+
+  screenshot: confirm
+  clipboard_read: confirm
+  clipboard_write: true
+
+  run_command: deny
+  run_script: deny
+
+  web_search: true
+  weather: true
+  time_date: true
+
+  volume_up: true
+  volume_down: true
+  volume_mute: true
+  brightness_up: true
+  brightness_down: true
+
+  keyboard_type: true
+  keyboard_hotkey: true
+  mouse_move: true
+  mouse_click: true
+
+  open_file: confirm
+
+# Directorios permitidos para operaciones con archivos
+allowed_directories:
+  - "%USERPROFILE%\\Desktop"
+  - "%USERPROFILE%\\Documents"
+  - "%USERPROFILE%\\Downloads"
+  - "%PUBLIC%"
