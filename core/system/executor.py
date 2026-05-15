@@ -31,6 +31,7 @@ class SystemExecutor:
             "list_directory": self._list_directory,
             "read_file": self._read_file,
             "write_file": self._write_file,
+            "shutdown_ranni": self._shutdown_ranni,
         }
         handler = action_map.get(intent)
         if not handler:
@@ -242,3 +243,6 @@ class SystemExecutor:
             return {"success": True, "message": f"Archivo escrito: {path}"}
         except:
             return {"success": False, "message": f"No se pudo escribir: {path}"}
+
+    def _shutdown_ranni(self, params):
+        return {"success": True, "message": "Apagando RANNI...", "shutdown": True}

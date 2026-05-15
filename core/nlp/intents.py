@@ -30,6 +30,7 @@ class IntentParser:
             (r"^(bloquear|bloquea)", "lock_system", {}),
             (r"^(apagar|apaga)", "shutdown", {}),
             (r"^(reiniciar|reinicia)", "restart", {}),
+            (r"^(salir|cerrar|terminar|apagar ranni|ciérrate|chao)", "shutdown_ranni", {}),
         ]
         import re
         for pattern, intent_name, param_key in rules:

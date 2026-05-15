@@ -5,6 +5,10 @@ faster-whisper>=1.1.0
 piper-tts>=1.2.0
 silero-vad>=4.0.0
 sounddevice>=0.5.1
+pyttsx3>=2.98
+keyboard>=0.13.5
+comtypes>=1.4.0
+pycaw>=20181226
 
 # === NLP / IA Local ===
 requests>=2.32.0
@@ -18,14 +22,12 @@ chromadb>=0.5.0
 PyAutoGUI>=0.9.54
 psutil>=6.1.0
 pygetwindow>=0.0.9
-pywinctl>=0.5.0
+pywinctl>=0.0.42
 watchdog>=5.0.0
 schedule>=1.2.0
 
 # === COMUNICACIÓN ===
 websockets>=13.0
-asyncio-extra>=1.2.0
-
 # === UTILIDADES ===
 pyyaml>=6.0.2
 pydantic>=2.9.0

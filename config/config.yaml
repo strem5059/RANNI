@@ -6,18 +6,25 @@ assistant:
   language: "es"
   debug: false
 
+wake_word:
+  mode: "auto"  # auto | porcupine | openwakeword | keyboard | porcupine_pro
+  hotkey: "ctrl+alt+r"  # solo para modo keyboard
+  threshold: 0.5
+  porcupine_key: "demo"  # "demo" funciona con keyword "computer"
+  keyword_path: ""  # ruta al archivo .ppn custom
+
 audio:
   sample_rate: 16000
   channels: 1
   chunk_size: 512
-  mic_device: null  # null = dispositivo por defecto
+  mic_device: null
   vad_threshold: 0.5
 
 stt:
   engine: "faster-whisper"
-  model: "tiny"  # tiny, base, small, medium, large
-  device: "auto"  # auto, cpu, cuda
-  compute_type: "int8"  # int8, float16, float32
+  model: "tiny"
+  device: "auto"
+  compute_type: "int8"
 
 tts:
   engine: "piper"
@@ -35,9 +42,7 @@ llm:
   quantization: "q4_k_m"
 
 memory:
-  engine: "chromadb"
-  collection: "ranni_context"
-  embeddings_model: "all-MiniLM-L6-v2"
+  engine: "sqlite"
   max_history: 100
 
 ui:

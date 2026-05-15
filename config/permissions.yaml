@@ -25,6 +25,10 @@ actions:
   system_restart: confirm
   system_sleep: confirm
   system_lock: true
+  lock_system: true
+  shutdown: confirm
+  restart: confirm
+  sleep: true
 
   screenshot: confirm
   clipboard_read: confirm
@@ -47,6 +51,7 @@ actions:
   keyboard_hotkey: true
   mouse_move: true
   mouse_click: true
+  shutdown_ranni: true
 
   open_file: confirm
 

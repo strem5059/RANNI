@@ -1,21 +1,29 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, screen } = require("electron");
 const path = require("path");
 
 let mainWindow;
 
 function createWindow() {
+  const WIDTH = 420;
+  const HEIGHT = 460;
+  const { width: sw, height: sh } = screen.getPrimaryDisplay().workAreaSize;
+  const x = sw - WIDTH - 20;
+  const y = sh - HEIGHT - 20;
+
   mainWindow = new BrowserWindow({
-    width: 1920,
-    height: 1080,
+    width: WIDTH,
+    height: HEIGHT,
+    x, y,
     transparent: true,
     frame: false,
     alwaysOnTop: true,
     resizable: false,
     skipTaskbar: true,
+    title: "RANNI UI",
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
-      nodeIntegration: false,
-      contextIsolation: true,
+      nodeIntegration: true,
+      contextIsolation: false,
     },
   });
 

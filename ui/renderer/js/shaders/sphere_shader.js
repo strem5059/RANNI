@@ -105,7 +105,6 @@ const binarySpriteFragmentShader = `
     float glow = exp(-dist * 6.0);
     float pulse = 0.8 + 0.2 * sin(uTime * 3.0 + vDigit * 6.28);
 
-    char c = vDigit > 0.5 ? '1' : '0';
     float alpha = smoothstep(0.5, 0.0, dist) * (0.6 + 0.4 * uPulse);
 
     vec3 color = uColor * pulse * (1.0 + glow * 0.5);

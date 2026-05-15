@@ -1,5 +1,6 @@
 import asyncio
 import signal
+import subprocess
 import sys
 import yaml
 from pathlib import Path
@@ -27,25 +28,25 @@ class RanniAssistant:
         self.state = AssistantState.IDLE
 
         # Inicializar componentes
-        self.wake_word = WakeWordDetector(
-            access_key=self.config.get("porcupine_key", ""),
-            keyword_path=self.config.get("wake_word_path")
-        )
+        self.wake_word = WakeWordDetector(config=self.config.get("wake_word", {}))
         self.stt = SpeechToText(
-            model_size=self.config.get("stt_model", "tiny"),
-            device=self.config.get("device", "auto")
+            model_size=self.config.get("stt", {}).get("model", "tiny"),
+            device=self.config.get("stt", {}).get("device", "auto")
         )
         self.tts = TextToSpeech(
-            voice=self.config.get("tts_voice", "es_ES-daveconroy-medium")
+            voice=self.config.get("tts", {}).get("voice", "es_ES-daveconroy-medium")
         )
         self.vad = VoiceActivityDetector()
         self.llm = LLMEngine(
-            host=self.config.get("ollama_host", "http://localhost:11434"),
-            model=self.config.get("llm_model", "llama3.2")
+            host=self.config.get("llm", {}).get("host", "http://localhost:11434"),
+            model=self.config.get("llm", {}).get("model", "llama3.2")
         )
         self.memory = ContextMemory()
         self.intent_parser = IntentParser()
-        self.executor = SystemExecutor()
+
+        permissions = self._load_permissions()
+        self.executor = SystemExecutor(permissions=permissions)
+
         self.automation = TaskAutomation()
         self.ui_bridge = UIBridge()
         self.running = True
@@ -58,6 +59,16 @@ class RanniAssistant:
                 return yaml.safe_load(f)
         except Exception as e:
             logger.warning(f"No se pudo cargar config: {e}")
+            return {}
+
+    def _load_permissions(self):
+        path = Path(__file__).parent.parent / "config" / "permissions.yaml"
+        try:
+            with open(path, "r") as f:
+                data = yaml.safe_load(f)
+                return data.get("actions", {}) if data else {}
+        except Exception as e:
+            logger.warning(f"No se pudieron cargar permisos: {e}")
             return {}
 
     async def start(self):
@@ -144,6 +155,16 @@ class RanniAssistant:
 
         # Ejecutar acción
         result = self.executor.execute(intent_data["intent"], intent_data["params"])
+
+        if result.get("shutdown"):
+            await self.ui_bridge.broadcast("shutdown", {})
+            await self.ui_bridge.send_status("shutdown", "Apagando RANNI...")
+            self.tts.speak("Apagando RANNI")
+            await asyncio.sleep(2)
+            self.running = False
+            if sys.platform == "win32":
+                subprocess.run('taskkill /f /fi "WindowTitle eq RANNI UI" 2>nul', shell=True)
+            return
 
         response_text = result.get("message", intent_data.get("response", "Listo"))
         self.tts.speak(response_text)

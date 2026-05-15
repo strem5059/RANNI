@@ -3,6 +3,7 @@ import tempfile
 import wave
 import pyaudio
 import os
+import shutil
 from pathlib import Path
 from core.utils.logger import ranni_logger
 

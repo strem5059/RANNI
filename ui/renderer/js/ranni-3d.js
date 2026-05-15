@@ -1,6 +1,9 @@
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-camera.position.set(0, 0, 4);
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 3.5);
+
+let fpsLimit = 30;
+let lastFrame = 0;
 
 const renderer = new THREE.WebGLRenderer({
   canvas: document.getElementById("ranni-canvas"),
@@ -8,7 +11,7 @@ const renderer = new THREE.WebGLRenderer({
   antialias: true,
 });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
 renderer.setClearColor(0x000000, 0);
 
 const clock = new THREE.Clock();
@@ -17,12 +20,13 @@ let sphereGroup, binaryPoints, ringGroup;
 let currentPulse = 0;
 let targetPulse = 0;
 let waveIntensity = 0.3;
+let isActive = false;
 
 // === ESFERA HOLOGRÁFICA PRINCIPAL ===
 function createHoloSphere() {
   sphereGroup = new THREE.Group();
 
-  const geo = new THREE.SphereGeometry(1.2, 64, 64);
+  const geo = new THREE.SphereGeometry(1.2, 32, 32);
   const mat = new THREE.ShaderMaterial({
     vertexShader: sphereVertexShader,
     fragmentShader: sphereFragmentShader,
@@ -78,7 +82,7 @@ function createHoloSphere() {
 
 // === BITS BINARIOS (1s y 0s) ===
 function createBinaryBits() {
-  const count = 2048;
+  const count = 384;
   const positions = new Float32Array(count * 3);
   const sizes = new Float32Array(count);
   const speeds = new Float32Array(count);
@@ -124,7 +128,7 @@ function createBinaryBits() {
 
 // === PARTÍCULAS DE FONDO ===
 function createBackgroundParticles() {
-  const count = 3000;
+  const count = 400;
   const positions = new Float32Array(count * 3);
   for (let i = 0; i < count; i++) {
     positions[i * 3] = (Math.random() - 0.5) * 20;
@@ -149,17 +153,36 @@ createBackgroundParticles();
 
 // === WEBSOCKET ===
 let ws = null;
+let shuttingDown = false;
 function connectWebSocket() {
+  setConnectionStatus(false);
   ws = new WebSocket("ws://127.0.0.1:9876");
-  ws.onopen = () => console.log("RANNI UI: Conectado al backend");
+  ws.onopen = () => {
+    shuttingDown = false;
+    setConnectionStatus(true);
+    console.log("RANNI UI: Conectado al backend");
+  };
   ws.onmessage = (e) => {
     const msg = JSON.parse(e.data);
     handleBackendMessage(msg);
   };
   ws.onclose = () => {
+    if (shuttingDown) {
+      console.log("RANNI UI: Apagando...");
+      return;
+    }
+    setConnectionStatus(false);
     console.log("RANNI UI: Desconectado, reconectando...");
     setTimeout(connectWebSocket, 2000);
   };
+}
+
+function setConnectionStatus(connected) {
+  const el = document.getElementById("status-corner");
+  if (el) {
+    el.textContent = connected ? "CONECTADO" : "DESCONECTADO";
+    el.style.color = connected ? "#00f0ff" : "#ff4444";
+  }
 }
 
 function handleBackendMessage(msg) {
@@ -174,6 +197,11 @@ function handleBackendMessage(msg) {
     case "audio_level":
       updateAudioLevel(data.level);
       break;
+    case "shutdown":
+      console.log("RANNI: Recibida orden de cierre");
+      shuttingDown = true;
+      setTimeout(() => window.close(), 500);
+      break;
   }
 }
 
@@ -185,7 +213,13 @@ function sendToBackend(msg) {
 
 // === ESTADOS ===
 function setState(state) {
-  document.getElementById("status-corner").textContent = state.toUpperCase();
+  isActive = state !== "idle";
+  fpsLimit = isActive ? 60 : 24;
+  const statusEl = document.getElementById("status-corner");
+  if (statusEl) {
+    statusEl.textContent = state.toUpperCase();
+    statusEl.style.color = "#00f0ff";
+  }
   switch (state) {
     case "listening":
       setSpherePulse(1.0, 0.8);
@@ -242,8 +276,12 @@ window.addEventListener("resize", () => {
 });
 
 // === LOOP PRINCIPAL ===
-function animate() {
+function animate(time) {
   requestAnimationFrame(animate);
+
+  const interval = 1000 / fpsLimit;
+  if (time - lastFrame < interval) return;
+  lastFrame = time - (time - lastFrame) % interval;
 
   const t = clock.getElapsedTime();
 
